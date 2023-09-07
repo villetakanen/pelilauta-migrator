@@ -1,0 +1,11 @@
+{
+  "name": "pelilauta-migrator",
+  "version": "0.0.1",
+  "description": "A CLI tool that migrates files to a pelilauta site",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "MIT"
+}
