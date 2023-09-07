@@ -1,3 +1,3 @@
 import { migrate } from "./migrator";
 
-migrate("My Site");
+migrate("test-site");
