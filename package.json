@@ -4,8 +4,12 @@
   "description": "A CLI tool that migrates files to a pelilauta site",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "build:": "tsc"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.2.2"
+  }
 }
