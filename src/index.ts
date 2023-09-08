@@ -27,7 +27,5 @@ const argv = y
   .alias('help', 'h').argv;
 
 const { site, owner, force } = await argv;
-const forceSiteOverwrite = force || false;
-
 
 migrate(site, owner, force);
