@@ -36,6 +36,17 @@ export async function importPages(siteKey: string, owners: string[], urlconversi
       }
     })
 
+    //Convert local links
+    const newPage2 = newPage.replace(/\[(.*?)\]\((.*?)\)/g, (match, text, url) => {
+      if (url.startsWith('http')) {
+        return match
+      }
+      const newUrl = url.replace(/\.md/g, '')
+      return `[${text}](/sites/${siteKey}/pages/${newUrl})`
+    })
+
+    const pageKey = pageFile.substring(0, pageFile.length - 3)
+
     // Create the page
     const pageData: PageData = {
       createdAt: FieldValue.serverTimestamp(),
@@ -43,8 +54,8 @@ export async function importPages(siteKey: string, owners: string[], urlconversi
       flowTime: FieldValue.serverTimestamp(),
       owners: owners,
       parentKey: siteKey,
-      name: pageFile.substring(0, pageFile.length - 3),
-      markdownContent: newPage,
+      name: pageKey,
+      markdownContent: newPage2,
       htmlContent: '',
       category: '',
       sortWeight: 0,
@@ -52,11 +63,11 @@ export async function importPages(siteKey: string, owners: string[], urlconversi
     }
 
     const db = getFirestore()
-    const pageDoc = await db.collection('sites').doc(siteKey).collection('pages').add(pageData)
+    const pageDoc = await db.collection('sites').doc(siteKey).collection('pages').doc(pageKey).set(pageData)
 
     // If this page was the site's homepage, set it as such
     if (pageFile === 'index.md') {
-        await db.collection('sites').doc(siteKey).update({ homepage: pageDoc.id })
+        await db.collection('sites').doc(siteKey).update({ homepage: pageKey })
     }
 
     /* Add the page to the site's index
