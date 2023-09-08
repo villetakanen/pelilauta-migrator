@@ -16,7 +16,7 @@ function initFirebase() {
 });  
 }
 
-export async function migrate(siteName: string, ownerUid: string = initialOwnerUid) {
+export async function migrate(siteName: string, ownerUid: string = initialOwnerUid, forceSiteOverwrite = false) {
   initFirebase();
 
   const siteKey = toMekanismiURI(siteName);
@@ -29,7 +29,7 @@ export async function migrate(siteName: string, ownerUid: string = initialOwnerU
   console.log(`Found ${files.length} files to import`);
 
   // Create the site
-  await initSite(siteKey, [ownerUid]);
+  await initSite(siteKey, [ownerUid], forceSiteOverwrite);
   
   // Upload images
   const urlconversionMap = await uploadImages(siteKey, [ownerUid]);
