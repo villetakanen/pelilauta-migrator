@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import { getStorage } from 'firebase-admin/storage';
-import { Timestamp, getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 
 const IMAGE_ENDINGS = [
   '.jpg', 
@@ -11,7 +11,7 @@ const IMAGE_ENDINGS = [
 
 type AssetData = {
   url: string
-  descrption: string
+  description: string
   license: string
   site: string
   mimetype: string
@@ -54,14 +54,14 @@ export async function uploadImages(siteKey: string, owners: string[]) {
       expires: '01-01-2100'
     })
 
-    console.log(`Uploaded ${imageFile} to ${imageRef.metadata.id} - ${JSON.stringify(imageRef.metadata)}`)
+    
 
     const db = getFirestore()
 
     const asset:AssetData = {
       url: url[0],
-      descrption: 'This image was imported by the pelilauta-migrator, you might want to add a licence or description for it.',
-      license: '',
+      description: 'This image was imported by the pelilauta-migrator, you might want to add a licence or description for it.',
+      license: '0',
       site: siteKey,
       name: imageFile,
       mimetype: imageRef.metadata.contentType,
@@ -72,9 +72,10 @@ export async function uploadImages(siteKey: string, owners: string[]) {
       owners: owners
     }
 
-    await db.collection('assets').add(asset)
+    const assetDoc = await db.collection('assets').add(asset)
+    console.log(`Uploaded ${imageFile} to ${imageRef.metadata.id}, with metadata at ${assetDoc.id}`)
 
-    urlconversionMap.set(imagePath, url[0])
+    urlconversionMap.set(imageFile, url[0])
   }
 
   return urlconversionMap

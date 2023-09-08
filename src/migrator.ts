@@ -2,6 +2,8 @@ import fs from 'fs-extra';
 import { toMekanismiURI } from './toMekanismiURI.js';
 import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { uploadImages } from './uploadImages.js';
+import { initSite } from './initSite.js';
+import { importPages } from './importPages.js';
 
 const importDir = './import';
 const initialOwnerUid = 'YN8dQz3H8OMsb0L4jImAlROPQpo1'
@@ -14,7 +16,7 @@ function initFirebase() {
 });  
 }
 
-export function migrate(siteName: string, ownerUid: string = initialOwnerUid) {
+export async function migrate(siteName: string, ownerUid: string = initialOwnerUid) {
   initFirebase();
 
   const siteKey = toMekanismiURI(siteName);
@@ -27,7 +29,15 @@ export function migrate(siteName: string, ownerUid: string = initialOwnerUid) {
   console.log(`Found ${files.length} files to import`);
 
   // Create the site
+  await initSite(siteKey, [ownerUid]);
   
   // Upload images
-  uploadImages(siteKey, [ownerUid]);
+  const urlconversionMap = await uploadImages(siteKey, [ownerUid]);
+
+  console.log('URL conversion map:' + JSON.stringify(Object.fromEntries(urlconversionMap)));
+
+  // Import pages
+  await importPages(siteKey, [ownerUid], urlconversionMap);
+
+  console.log('Done!');
 }
